@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import atlantafx.base.controls.PasswordTextField?>
+
+<?import atlantafx.base.controls.Spacer?>
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="com.sunkenpotato.client2p.controller.ACController">
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label styleClass="h1">Create an account</Label>
+    <Spacer/>
+    <HBox alignment="CENTER" spacing="10">
+        <Label fx:id="usernameLabel" />
+        <TextField fx:id="usernameField"/>
+    </HBox>
+    <HBox alignment="CENTER" spacing="10">
+        <Label fx:id="passwordLabel" />
+        <PasswordTextField fx:id="passwordField" />
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label fx:id="confirmPasswordLabel">
+            <HBox.margin>
+                <Insets left="6.0"/>
+            </HBox.margin>
+        </Label>
+
+        <PasswordTextField fx:id="confirmPasswordField" />
+    </HBox>
+    <Label fx:id="infoText" styleClass="infoText" />
+    <HBox alignment="CENTER" spacing="10">
+        <Button fx:id="returnButton" onAction="#backToLoginScreen" style="-fx-background-color: -color-base-5" />
+        <Button fx:id="createAccountButton" onAction="#createAccount" style="-fx-background-color: -color-accent-5" disable="true"/>
+    </HBox>
+</VBox>

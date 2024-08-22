@@ -1,0 +1,26 @@
+{
+  "text.sample_text": "Some sample text",
+
+  "text.labels.username": "Username",
+  "text.labels.password": "Password",
+  "text.labels.confirm_password": "Confirm Password",
+  "text.labels.register_ok": "Password is OK",
+
+  "text.button.login": "Log in",
+  "text.button.create_account": "Create Account",
+  "text.button.return_to_login": "Return to Login",
+
+  "text.warning.password_too_short": "Password is too short!",
+  "text.warning.password_not_equal": "Passwords are not equal!",
+  "text.warning.username_short": "Username is too short!",
+  "text.warning.username_incompatible": "Username contains invalid characters",
+
+  "text.response.user_exists": "User already exists!",
+  "text.response.server_error": "An unexpected server error occurred.",
+  "text.response.user_created": "User created!",
+  "text.response.unknown_user": "Unknown user",
+  "text.response.bad_password": "Incorrect Password",
+  "text.response.server_offline": "Server is unreachable. Please try again later.",
+  "text.response.unexpected_error": "An unexpected error occurred. Please check the logs for more information."
+
+}
