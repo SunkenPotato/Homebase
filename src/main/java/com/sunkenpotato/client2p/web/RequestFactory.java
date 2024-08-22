@@ -15,8 +15,12 @@ import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.entity.mime.MultipartPart;
+import org.apache.hc.client5.http.entity.mime.StringBody;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.apache.hc.core5.concurrent.CallbackContribution;
+import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.*;
 
 import java.io.File;
@@ -123,37 +127,26 @@ public class RequestFactory {
 
     public FileUploadResponse uploadFile(String name, boolean isProtected, File file) throws ExecutionException, InterruptedException, IOException {
 
+        String boundary = "------------------27problemsandyouaintone";
+
+        FileBody fileBody = new FileBody(file);
+
+        FileUpload uploadData = new FileUpload(name, isProtected, MainApplication.USERNAME);
+        StringBody jsonData = new StringBody(uploadData.toJSON(), ContentType.APPLICATION_JSON);
+
         HttpPut request = new HttpPut(URI.create(BASE_URL + "/file/upload"));
-        request.setHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken());
-        request.setHeader("Content-Type", "multipart/form-data; boundary=-----------27problems"); // help pls
 
-        // file
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
-        builder.setBoundary("-----------27problems");
+        request.addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken());
+        request.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
 
-        builder.addPart("file", new FileBody(file, ContentType.APPLICATION_OCTET_STREAM));
-        // json
-        FileUpload fileUpload = new FileUpload(name, isProtected, MainApplication.USERNAME);
-        String json = fileUpload.toJSON();
-        builder.addTextBody("json_data", json, ContentType.APPLICATION_JSON);
+        MultipartEntityBuilder entity = MultipartEntityBuilder.create()
+                .addPart("file", fileBody)
+                .addPart("json_data", jsonData)
+                .setBoundary(boundary);
 
-        HttpEntity entity = builder.build();
-        request.setEntity(entity);
+        request.setEntity(entity.build());
 
-        // request.setHeader("Content-Length", String.valueOf(file.length() + json.length()));
-
-        System.out.println(Arrays.toString(request.getHeaders()));
-
-        try {
-            System.out.println(request.getHeader("Content-Length"));
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        }
-
-        var response = httpClient.execute(SimpleRequestBuilder.copy(request).build(), null).get();
-
-        System.out.println(response);
+        SimpleHttpResponse response = httpClient.execute(SimpleRequestBuilder.copy(request).build(), null).get();
 
         return switch(response.getCode()) {
             case 400 -> {
