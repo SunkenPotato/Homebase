@@ -15,7 +15,7 @@
                 <Insets top="15" bottom="15"/>
             </HBox.margin>
             <buttons>
-                <Button fx:id="uploadButton" styleClass="accent">
+                <Button fx:id="uploadButton" styleClass="accent" onAction="#uploadFile">
                     <graphic>
                         <FontIcon iconLiteral="fth-upload-cloud" iconSize="30"/>
                     </graphic>

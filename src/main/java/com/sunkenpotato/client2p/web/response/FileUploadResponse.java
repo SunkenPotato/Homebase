@@ -1,12 +1,13 @@
-package com.sunkenpotato.client2p.web;
+package com.sunkenpotato.client2p.web.response;
 
 import com.sunkenpotato.client2p.internal.FileItem;
 
-public class FileUploadResponse {
+public final class FileUploadResponse extends APIResponse{
     private final FileItem fileItem;
     private final int statusCode;
 
     private FileUploadResponse(FileItem fileItem, int statusCode) {
+        super(statusCode);
         this.fileItem = fileItem;
         this.statusCode = statusCode;
     }
@@ -27,8 +28,9 @@ public class FileUploadResponse {
         return new FileUploadResponse(fileItem);
     }
 
-    public boolean wasSuccessful() {
-        return statusCode >= 200 && statusCode < 300;
+    @Override
+    short getOkStatus() {
+        return 201;
     }
 
     public FileItem getFileItem() {

@@ -4,18 +4,26 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sunkenpotato.client2p.MainApplication;
 import com.sunkenpotato.client2p.internal.FileItem;
+import com.sunkenpotato.client2p.web.response.CreateUserResponse;
+import com.sunkenpotato.client2p.web.response.FileUploadResponse;
+import com.sunkenpotato.client2p.web.response.ListFileResponse;
+import com.sunkenpotato.client2p.web.response.LoginResponse;
 import javafx.scene.control.Alert;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.core5.http.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -44,12 +52,9 @@ public class RequestFactory {
 
         SimpleHttpRequest request = SimpleHttpRequest.create(Method.POST, URI.create(BASE_URL + "/user/login"));
 
-        String body = "{" +
-                "\"username\":\"" + username + "\"," +
-                "\"password\":\"" + password + "\"" +
-                "}";
+        UserData body = new UserData(username, password);
 
-        request.setBody(body, ContentType.APPLICATION_JSON);
+        request.setBody(body.toJSON(), ContentType.APPLICATION_JSON);
 
         SimpleHttpResponse response = httpClient.execute(request, null).get();
 
@@ -68,16 +73,10 @@ public class RequestFactory {
     public CreateUserResponse createUserRequest(String username, String password) {
         SimpleHttpRequest request = SimpleHttpRequest.create(Method.POST, URI.create(BASE_URL + "/user/create"));
         // I know it's ugly lol
-        String sb = "{" +
-                "\"username\":\"" +
-                username + "\"," +
-                "\"password\":\"" +
-                password +
-                "\"" +
-                "}";
+        UserData jsonData = new UserData(username, password);
 
-        request.setBody(sb, ContentType.APPLICATION_JSON);
-        SimpleHttpResponse response = null;
+        request.setBody(jsonData.toJSON(), ContentType.APPLICATION_JSON);
+        SimpleHttpResponse response;
         try {
             response = httpClient.execute(request, null).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -122,33 +121,55 @@ public class RequestFactory {
         };
     }
 
-    public FileUploadResponse uploadFile(String name, boolean isProtected, File file) throws ExecutionException, InterruptedException {
+    public FileUploadResponse uploadFile(String name, boolean isProtected, File file) throws ExecutionException, InterruptedException, IOException {
 
-        HttpPut request = new HttpPut(URI.create(BASE_URL + "/file/delete/" + MainApplication.USERNAME));
+        HttpPut request = new HttpPut(URI.create(BASE_URL + "/file/upload"));
         request.setHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken());
-        request.setHeader("Content-Type", ContentType.MULTIPART_FORM_DATA.toString());
+        request.setHeader("Content-Type", "multipart/form-data; boundary=-----------27problems"); // help pls
 
+        // file
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addBinaryBody("file", file, ContentType.DEFAULT_BINARY, file.getName());
+        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
+        builder.setBoundary("-----------27problems");
 
-        FileUploadJSON jsonData = new FileUploadJSON(name, isProtected, MainApplication.USERNAME);
-        builder.addTextBody("json_data", jsonData.toString());
+        builder.addPart("file", new FileBody(file, ContentType.APPLICATION_OCTET_STREAM));
+        // json
+        FileUpload fileUpload = new FileUpload(name, isProtected, MainApplication.USERNAME);
+        String json = fileUpload.toJSON();
+        builder.addTextBody("json_data", json, ContentType.APPLICATION_JSON);
 
         HttpEntity entity = builder.build();
         request.setEntity(entity);
 
-        SimpleHttpResponse response = httpClient.execute(SimpleRequestBuilder.copy(request).build(), null).get();
+        // request.setHeader("Content-Length", String.valueOf(file.length() + json.length()));
+
+        System.out.println(Arrays.toString(request.getHeaders()));
+
+        try {
+            System.out.println(request.getHeader("Content-Length"));
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        }
+
+        var response = httpClient.execute(SimpleRequestBuilder.copy(request).build(), null).get();
+
+        System.out.println(response);
 
         return switch(response.getCode()) {
-            case 400 -> FileUploadResponse.fromCode(400);
+            case 400 -> {
+                var returnResponse = FileUploadResponse.fromCode(400);
+                System.err.println(response.getBodyText());
+                yield returnResponse;
+            }
             case 404 -> FileUploadResponse.fromCode(404);
             case 403 -> FileUploadResponse.fromCode(403);
             case 500 -> FileUploadResponse.fromCode(500);
             case 200 -> {
-                FileItem responseItem = gson.fromJson(response.getBodyText(), FileItem.class);
+                //FileItem responseItem = gson.fromJson(response.getBodyText(), FileItem.class);
+                yield null;
             }
-        }
-
+            default -> FileUploadResponse.fromCode(response.getCode());
+        };
     }
 
     public void showSessionExpired() {
@@ -157,25 +178,5 @@ public class RequestFactory {
         alert.setHeaderText(null);
         alert.setContentText("Session expired. Please close the application and login again.");
         alert.showAndWait();
-    }
-
-    private class FileUploadJSON {
-
-        private final String filename, username;
-        private final boolean isProtected;
-
-        public FileUploadJSON(String filename, boolean isProtected, String username) {
-            this.filename = filename;
-            this.isProtected = isProtected;
-            this.username = username;
-        }
-
-        @Override
-        public String toString() {
-            return "{" +
-                    "filename: " + filename + ","
-                    + "protected: " + isProtected + ","
-                    + "username: " + username + "}";
-        }
     }
 }

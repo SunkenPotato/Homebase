@@ -1,14 +1,15 @@
-package com.sunkenpotato.client2p.web;
+package com.sunkenpotato.client2p.web.response;
 
 import com.sunkenpotato.client2p.internal.FileItem;
 
 import java.util.List;
 
-public class ListFileResponse {
+public non-sealed class ListFileResponse extends APIResponse {
     private final List<FileItem> files;
     private final int statusCode;
 
     private ListFileResponse(int statusCode, List<FileItem> files) {
+        super(statusCode);
         this.statusCode = statusCode;
         this.files = files;
     }
@@ -17,8 +18,9 @@ public class ListFileResponse {
         return statusCode;
     }
 
-    public boolean wasSuccessful() {
-        return statusCode == 200;
+    @Override
+    short getOkStatus() {
+        return 200;
     }
 
     public static ListFileResponse fromCode(int statusCode) {

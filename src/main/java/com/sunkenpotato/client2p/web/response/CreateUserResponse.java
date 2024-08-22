@@ -1,4 +1,4 @@
-package com.sunkenpotato.client2p.web;
+package com.sunkenpotato.client2p.web.response;
 
 public enum CreateUserResponse {
     OK(201),

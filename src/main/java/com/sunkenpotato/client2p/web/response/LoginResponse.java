@@ -1,6 +1,6 @@
-package com.sunkenpotato.client2p.web;
+package com.sunkenpotato.client2p.web.response;
 
-    public final class LoginResponse extends APIResponse {
+public final class LoginResponse extends APIResponse {
     private final String token;
 
     private LoginResponse(int statusCode, String token) {
@@ -24,7 +24,8 @@ package com.sunkenpotato.client2p.web;
         return token;
     }
 
-    public boolean wasSuccessful() {
-        return statusCode == 200;
+    @Override
+    short getOkStatus() {
+        return 200;
     }
 }

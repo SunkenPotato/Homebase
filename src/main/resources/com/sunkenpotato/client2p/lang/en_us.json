@@ -15,6 +15,8 @@
   "text.warning.username_short": "Username is too short!",
   "text.warning.username_incompatible": "Username contains invalid characters",
 
+  "text.errors.error": "Error",
+
   "text.response.user_exists": "User already exists!",
   "text.response.server_error": "An unexpected server error occurred.",
   "text.response.user_created": "User created!",

@@ -1,6 +1,7 @@
 package com.sunkenpotato.client2p;
 
 import atlantafx.base.theme.PrimerDark;
+import com.google.gson.Gson;
 import com.sunkenpotato.client2p.web.AuthorizationToken;
 import com.sunkenpotato.client2p.i18n.Text;
 import com.sunkenpotato.client2p.i18n.Translator;
@@ -8,6 +9,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -21,6 +24,8 @@ public class MainApplication extends Application {
     public static final Translator APPLICATION_TRANSLATOR = Translator.fromLanguage(APPLICATION_LANGUAGE);
     public final static AuthorizationToken AUTHORIZATION_TOKEN = new AuthorizationToken("");
     public static Stage MAIN_STAGE;
+    public static final Gson GSON = new Gson();
+    public static final Logger LOGGER = LoggerFactory.getLogger(MainApplication.class);
 
     static {
 

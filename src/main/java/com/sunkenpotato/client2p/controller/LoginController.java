@@ -3,9 +3,7 @@ package com.sunkenpotato.client2p.controller;
 import atlantafx.base.controls.CustomTextField;
 import atlantafx.base.controls.PasswordTextField;
 import com.sunkenpotato.client2p.MainApplication;
-import com.sunkenpotato.client2p.internal.FileItem;
-import com.sunkenpotato.client2p.web.AuthorizationToken;
-import com.sunkenpotato.client2p.web.LoginResponse;
+import com.sunkenpotato.client2p.web.response.LoginResponse;
 import com.sunkenpotato.client2p.web.RequestFactory;
 import com.sunkenpotato.client2p.i18n.Text;
 import javafx.fxml.FXML;
@@ -61,7 +59,7 @@ public class LoginController {
             return;
         }
 
-        if (!response.wasSuccessful()) {
+        if (response.failed()) {
             if (response.getStatusCode() == 404) {
                 Text unknownUserText = Text.translatable("text.response.unknown_user");
                 infoText.setText(unknownUserText.getTranslated());

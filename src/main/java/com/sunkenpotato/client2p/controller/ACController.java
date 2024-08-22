@@ -1,14 +1,11 @@
 package com.sunkenpotato.client2p.controller;
 
 import atlantafx.base.controls.PasswordTextField;
-import com.sunkenpotato.client2p.MainApplication;
-import com.sunkenpotato.client2p.web.CreateUserResponse;
+import com.sunkenpotato.client2p.web.response.CreateUserResponse;
 import com.sunkenpotato.client2p.web.RequestFactory;
 import com.sunkenpotato.client2p.i18n.Text;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;

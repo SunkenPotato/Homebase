@@ -9,6 +9,7 @@ module com.sunkenpotato.client2p {
     requires org.apache.commons.io;
     requires org.kordamp.ikonli.javafx;
     requires java.net.http;
+    requires org.slf4j;
 
     opens com.sunkenpotato.client2p to javafx.fxml;
     exports com.sunkenpotato.client2p;
@@ -17,4 +18,5 @@ module com.sunkenpotato.client2p {
     opens com.sunkenpotato.client2p.controller to javafx.fxml;
     exports com.sunkenpotato.client2p.web;
     exports com.sunkenpotato.client2p.i18n;
+    exports com.sunkenpotato.client2p.web.response;
 }
