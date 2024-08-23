@@ -4,17 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sunkenpotato.client2p.MainApplication;
 import com.sunkenpotato.client2p.internal.FileItem;
-import com.sunkenpotato.client2p.web.response.CreateUserResponse;
-import com.sunkenpotato.client2p.web.response.FileUploadResponse;
-import com.sunkenpotato.client2p.web.response.ListFileResponse;
-import com.sunkenpotato.client2p.web.response.LoginResponse;
+import com.sunkenpotato.client2p.web.response.*;
 import javafx.scene.control.Alert;
 import okhttp3.*;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.util.List;
+import java.util.Optional;
 
 public class RequestFactory {
 
@@ -161,7 +161,68 @@ public class RequestFactory {
         }
     }
 
-    public
+    public DownloadFileResponse downloadFile(FileItem fileItem) throws IOException {
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/file/" + MainApplication.USERNAME + "/" + fileItem.filename)
+                .get()
+                .addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
+                .build();
+
+        try {
+            Response response = httpClient.newCall(request).execute();
+
+            if (!response.isSuccessful()) {
+                return switch (response.code()) {
+                    case 404 -> DownloadFileResponse.NOT_FOUND;
+                    case 403 -> {
+                        showSessionExpired();
+                        yield DownloadFileResponse.SESSION_EXPIRED;
+                    }
+                    case 500 -> DownloadFileResponse.SERVER_FS_ERROR;
+                    default -> DownloadFileResponse.UNKNOWN;
+                };
+            }
+
+            ResponseBody body = response.body();
+            if (body == null) return DownloadFileResponse.EMPTY_BODY;
+
+            try (InputStream in = body.byteStream(); FileOutputStream fs = new FileOutputStream(System.getProperty("user.home") + "/Downloads/" + fileItem.filename)) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    fs.write(buffer, 0, bytesRead);
+                }
+
+                return DownloadFileResponse.OK;
+            }
+
+        } catch (ConnectException e) {
+            return DownloadFileResponse.CONNECTION_FAILURE;
+        }
+    }
+
+    public DeleteFileResponse deleteFile(FileItem fileItem) throws IOException{
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/file/delete/"+MainApplication.USERNAME+"/"+fileItem.filename)// TODO: replace w/ string templates or something
+                .delete()
+                .header("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
+                .build();
+
+        try {
+            Response response = httpClient.newCall(request).execute();
+
+            return switch (response.code()) {
+                case 404 -> DeleteFileResponse.NOT_FOUND;
+                case 403 -> DeleteFileResponse.FORBIDDEN;
+                case 500 -> DeleteFileResponse.FS_ERROR;
+                case 200 -> DeleteFileResponse.OK;
+                default -> DeleteFileResponse.UNKNOWN;
+            };
+
+        } catch (ConnectException e) {
+            return DeleteFileResponse.CONNECTION_ERROR;
+        }
+    }
 
     public void showSessionExpired() {
         Alert alert = new Alert(Alert.AlertType.WARNING);

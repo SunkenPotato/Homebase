@@ -7,7 +7,7 @@
 <!--suppress JavaFxUnresolvedStyleClassReference -->
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.sunkenpotato.client2p.controller.MainController" fx:id="listView">
+      fx:controller="com.sunkenpotato.client2p.controller.MainController">
 
     <HBox alignment="CENTER_LEFT">
         <ButtonBar>
@@ -20,12 +20,12 @@
                         <FontIcon iconLiteral="fth-upload-cloud" iconSize="30"/>
                     </graphic>
                 </Button>
-                <Button fx:id="downloadButton" disable="true">
+                <Button fx:id="downloadButton" disable="true" onAction="#downloadFile">
                     <graphic>
                         <FontIcon iconLiteral="fth-download-cloud" iconSize="30"/>
                     </graphic>
                 </Button>
-                <Button fx:id="deleteButton" disable="true" styleClass="danger">
+                <Button fx:id="deleteButton" disable="true" styleClass="danger" onAction="#deleteFile">
                     <graphic>
                         <FontIcon iconLiteral="fth-trash-2" iconSize="30"/>
                     </graphic>
@@ -42,5 +42,12 @@
             <TableColumn fx:id="ownerColumn" text="Owner"/>
         </columns>
     </TableView>
+    <HBox alignment="CENTER_LEFT">
+        <padding>
+            <Insets topRightBottomLeft="10"/>
+        </padding>
+
+        <Label fx:id="infoText"/>
+    </HBox>
 
 </VBox>

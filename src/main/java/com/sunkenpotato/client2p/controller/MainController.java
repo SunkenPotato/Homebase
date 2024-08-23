@@ -1,8 +1,9 @@
 package com.sunkenpotato.client2p.controller;
 
-import com.sunkenpotato.client2p.MainApplication;
 import com.sunkenpotato.client2p.i18n.Text;
 import com.sunkenpotato.client2p.internal.FileItem;
+import com.sunkenpotato.client2p.web.response.DeleteFileResponse;
+import com.sunkenpotato.client2p.web.response.DownloadFileResponse;
 import com.sunkenpotato.client2p.web.response.FileUploadResponse;
 import com.sunkenpotato.client2p.web.response.ListFileResponse;
 import com.sunkenpotato.client2p.web.RequestFactory;
@@ -19,10 +20,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 public class MainController {
 
+    @FXML
+    private Label infoText;
     @FXML
     private Button uploadButton, deleteButton, downloadButton;
     @FXML
@@ -37,6 +39,9 @@ public class MainController {
     private final Text serverOfflineText = Text.translatable("text.response.server_offline");
     private final Text errorText = Text.translatable("text.errors.error");
     private final Text unexpectedErrorText = Text.translatable("text.response.unexpected_error");
+    private final Text fileDownloadedText = Text.translatable("text.response.file_downloaded");
+    private final Text fileNotFoundText = Text.translatable("text.response.file_not_found");
+    private final Text serverFSError = Text.translatable("text.response.server_fs_error");
 
     @FXML
     private void initialize() {
@@ -117,9 +122,49 @@ public class MainController {
 
         fileTable.getItems().add(response.getFileItem());
         fileTable.refresh();
-
     }
 
+    @FXML
+    private void downloadFile() throws IOException {
+        FileItem fileItem = fileTable.getSelectionModel().getSelectedItem();
+        if (fileItem == null)
+            return;
+
+        DownloadFileResponse response = REQUEST_FACTORY.downloadFile(fileItem);
+        switch (response) {
+            // TODO: set this to a custom path/.properties path
+            case OK -> infoText.setText(fileDownloadedText.getTranslated() + " Downloads");
+            case NOT_FOUND -> setInfoTextWarn(fileNotFoundText);
+            case CONNECTION_FAILURE -> showAlert(errorText, serverOfflineText, Alert.AlertType.ERROR);
+            case UNKNOWN -> showAlert(errorText, unexpectedErrorText, Alert.AlertType.ERROR);
+            case SERVER_FS_ERROR -> setInfoTextWarn(serverFSError);
+            case SESSION_EXPIRED, EMPTY_BODY -> {}
+        }
+    }
+
+    @FXML
+    private void deleteFile() throws IOException {
+        FileItem fileItem = fileTable.getSelectionModel().getSelectedItem();
+        if (fileItem == null)
+            return;
+
+        DeleteFileResponse response = REQUEST_FACTORY.deleteFile(fileItem);
+        switch (response) {
+            case OK ->  {
+                fileTable.getItems().remove(fileItem);
+                infoText.setText(fileItem.filename + " Deleted");
+            }
+            case NOT_FOUND -> infoText.setText(fileItem.filename + " Not Found");
+            case FORBIDDEN -> REQUEST_FACTORY.showSessionExpired();
+            case CONNECTION_ERROR -> showAlert(errorText, serverOfflineText, Alert.AlertType.ERROR);
+            case UNKNOWN -> showAlert(errorText, unexpectedErrorText, Alert.AlertType.ERROR);
+        }
+    }
+
+    private void setInfoTextWarn(Text text) {
+        infoText.setText(text.getTranslated());
+        infoText.setStyle("-fx-text-fill: -color-warning-fg");
+    }
 
     private void populateTable() {
         ListFileResponse LFR;

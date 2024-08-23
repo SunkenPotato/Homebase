@@ -3,7 +3,7 @@ plugins {
     id 'application'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'org.openjfx.javafxplugin' version '0.0.13'
-    id 'org.beryx.jlink' version '2.25.0'
+    id 'org.beryx.jlink' version '3.0.0'
     id 'org.jetbrains.kotlin.jvm'
 }
 
@@ -14,10 +14,14 @@ repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = 21
+    targetCompatibility = 21
+}
+
 ext {
     junitVersion = '5.10.2'
 }
-
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -34,17 +38,17 @@ javafx {
 }
 
 dependencies {
-    implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
-
+    implementation 'org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0'
     implementation 'io.github.mkpaz:atlantafx-base:2.0.1'
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'org.kordamp.ikonli:ikonli-feather-pack:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
-    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 test {
@@ -62,6 +66,7 @@ jlink {
 jlinkZip {
     group = 'distribution'
 }
+
 kotlin {
     jvmToolchain(21)
 }
