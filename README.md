@@ -1,4 +1,4 @@
-# (name here) Client
+# Homebase Client
 A cloud storage client I made for fun. 
 
 Originally planned for private use. \
