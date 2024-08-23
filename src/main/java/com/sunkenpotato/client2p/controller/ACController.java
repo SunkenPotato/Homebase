@@ -109,7 +109,7 @@ public class ACController {
     }
 
     @FXML
-    private void createAccount() {
+    private void createAccount() throws IOException {
         String username = usernameField.getText();
         String password = passwordField.getPassword();
 
@@ -117,12 +117,15 @@ public class ACController {
 
         if (!response.wasSuccessful()) {
             if (response == CreateUserResponse.USER_EXISTS) {
+
                 infoText.setText(userExistsText.getTranslated());
                 infoText.setStyle(ERROR_STYLE);
             } else if (response == CreateUserResponse.SERVER_ERROR) {
+
                 infoText.setText(serverErrorText.getTranslated());
                 infoText.setStyle(ERROR_STYLE);
             } else if (response == CreateUserResponse.SERVER_DOWN) {
+
                 infoText.setText(serverDownText.getTranslated());
                 infoText.setStyle(ERROR_STYLE);
             } else if (response == CreateUserResponse.UNKNOWN) {

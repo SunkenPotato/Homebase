@@ -2,7 +2,7 @@ package com.sunkenpotato.client2p.web.response;
 
 import com.sunkenpotato.client2p.internal.FileItem;
 
-public final class FileUploadResponse extends APIResponse{
+public final class FileUploadResponse extends APIResponse {
     private final FileItem fileItem;
     private final int statusCode;
 

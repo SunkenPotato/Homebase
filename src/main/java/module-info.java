@@ -3,13 +3,13 @@ module com.sunkenpotato.client2p {
 
     requires org.kordamp.bootstrapfx.core;
     requires atlantafx.base;
-    requires org.apache.httpcomponents.client5.httpclient5;
-    requires org.apache.httpcomponents.core5.httpcore5;
     requires com.google.gson;
     requires org.apache.commons.io;
     requires org.kordamp.ikonli.javafx;
     requires java.net.http;
-    requires org.slf4j;
+    requires okhttp3;
+    requires annotations;
+    requires kotlin.stdlib;
 
     opens com.sunkenpotato.client2p to javafx.fxml;
     exports com.sunkenpotato.client2p;

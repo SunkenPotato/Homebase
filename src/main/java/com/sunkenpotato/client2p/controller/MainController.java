@@ -17,6 +17,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -97,8 +98,7 @@ public class MainController {
         FileUploadResponse response;
         try {
             response = REQUEST_FACTORY.uploadFile(uploadedFile.getName(), isProtected.isSelected(), uploadedFile);
-        } catch (ExecutionException | IOException | InterruptedException e) {
-            System.out.println("Called.");
+        } catch (IOException e) {
             e.printStackTrace();
             showAlert(errorText, serverOfflineText, Alert.AlertType.ERROR);
             return;
@@ -106,10 +106,10 @@ public class MainController {
 
         if (response.failed()) {
             switch (response.getStatusCode()) {
-                case 404 -> MainApplication.LOGGER.error("User was not found.");
+                case 404 -> System.err.println("User was not found.");
                 case 403 -> REQUEST_FACTORY.showSessionExpired();
-                case 500 -> MainApplication.LOGGER.error("Server-side error occurred. Please contact the developers.");
-                case 400 -> MainApplication.LOGGER.error("Bad request");
+                case 500 -> System.err.println("Server-side error occurred. Please contact the developers.");
+                case 400 -> System.err.println("Bad request");
                 default -> showAlert(errorText, serverOfflineText, Alert.AlertType.ERROR);
             }
             return;
@@ -126,12 +126,14 @@ public class MainController {
 
         try {
             LFR = REQUEST_FACTORY.listFiles();
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ConnectException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText(serverOfflineText.getTranslated());
             alert.showAndWait();
             return;
+        } catch (IOException e) {
+            throw new RuntimeException(e); // what exception :(
         }
 
         ObservableList<FileItem> osList = FXCollections.observableList(LFR.getFiles());

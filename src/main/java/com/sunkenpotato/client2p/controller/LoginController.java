@@ -31,7 +31,7 @@ public class LoginController {
     private final Text passwordText = Text.translatable("text.labels.password");
     private final Text loginText = Text.translatable("text.button.login");
     private final Text accountCreationText = Text.translatable("text.button.create_account");
-
+    private final Text serverOfflineText = Text.translatable("text.response.server_offline");
 
     @FXML
     public void initialize() {
@@ -46,18 +46,9 @@ public class LoginController {
         final String username = usernameField.getText();
         final String password = passwordField.getPassword();
 
-        System.out.println(password);
-
         LoginResponse response = null;
 
-        try {
-            response = REQUEST_FACTORY.loginRequest(username, password);
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-            Text errorText = Text.translatable("text.response.server_offline");
-            infoText.setText(errorText.getTranslated());
-            return;
-        }
+        response = REQUEST_FACTORY.loginRequest(username, password);
 
         if (response.failed()) {
             if (response.getStatusCode() == 404) {
@@ -68,6 +59,9 @@ public class LoginController {
                 Text unauthorizedUserText = Text.translatable("text.response.bad_password");
                 infoText.setText(unauthorizedUserText.getTranslated());
             }
+            else if (response.getStatusCode() == 1) {
+                infoText.setText(serverOfflineText.getTranslated());
+            }
             else {
                 Text errorText = Text.translatable("text.response.unexpected_error");
                 infoText.setText(errorText.getTranslated());
@@ -77,7 +71,6 @@ public class LoginController {
             MainApplication.USERNAME = username;
             changeScene("fxml/main-view.fxml", 900, 600);
         }
-
     }
 
     @FXML

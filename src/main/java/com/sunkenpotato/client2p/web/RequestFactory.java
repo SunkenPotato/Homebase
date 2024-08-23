@@ -9,33 +9,20 @@ import com.sunkenpotato.client2p.web.response.FileUploadResponse;
 import com.sunkenpotato.client2p.web.response.ListFileResponse;
 import com.sunkenpotato.client2p.web.response.LoginResponse;
 import javafx.scene.control.Alert;
-import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
-import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
-import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
-import org.apache.hc.client5.http.classic.methods.HttpPut;
-import org.apache.hc.client5.http.entity.mime.FileBody;
-import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
-import org.apache.hc.client5.http.entity.mime.MultipartPart;
-import org.apache.hc.client5.http.entity.mime.StringBody;
-import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
-import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
-import org.apache.hc.core5.concurrent.CallbackContribution;
-import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.*;
+import okhttp3.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.net.ConnectException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class RequestFactory {
 
     private final String BASE_URL;
-    private final CloseableHttpAsyncClient httpClient;
+    private final OkHttpClient httpClient;
     private final Gson gson = new Gson();
+
+    private static final MediaType APPLICATION_JSON = MediaType.parse("application/json");
 
     private final TypeToken<List<FileItem>> FILE_LIST_TYPE_TOKEN = new TypeToken<>() {};
 
@@ -43,127 +30,138 @@ public class RequestFactory {
 
     private RequestFactory(String url) {
         this.BASE_URL = url;
-        this.httpClient = HttpAsyncClients.createDefault();
-        httpClient.start();
+        this.httpClient = new OkHttpClient();
     }
 
     public static RequestFactory getInstance() {
         return INSTANCE;
     }
 
-    // TODO: add body lol
-    public LoginResponse loginRequest(String username, String password) throws ExecutionException, InterruptedException {
-
-        SimpleHttpRequest request = SimpleHttpRequest.create(Method.POST, URI.create(BASE_URL + "/user/login"));
+    // okhttp so much cleaner ong ong
+    @SuppressWarnings("DataFlowIssue")
+    public LoginResponse loginRequest(String username, String password) throws IOException {
 
         UserData body = new UserData(username, password);
 
-        request.setBody(body.toJSON(), ContentType.APPLICATION_JSON);
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/user/login")
+                .post(RequestBody.create(body.toJSON(), APPLICATION_JSON))
+                .build();
 
-        SimpleHttpResponse response = httpClient.execute(request, null).get();
-
-        return switch (response.getCode()) {
-            case 200:
-                yield LoginResponse.okResponse(response.getBodyText());
-            case 403:
-                yield LoginResponse.fromCode(403);
-            case 404:
-                yield LoginResponse.fromCode(404);
-            default:
-                yield LoginResponse.fromCode(response.getCode());
-        };
+        try {
+            Response response = httpClient.newCall(request).execute();
+            return switch (response.code()) {
+                case 200:
+                    yield LoginResponse.okResponse(response.body().string());
+                case 403:
+                    yield LoginResponse.fromCode(403);
+                case 404:
+                    yield LoginResponse.fromCode(404);
+                default:
+                    yield LoginResponse.fromCode(response.code());
+            };
+        } catch (ConnectException e) {
+            return LoginResponse.fromCode(1);
+        }
     }
 
-    public CreateUserResponse createUserRequest(String username, String password) {
-        SimpleHttpRequest request = SimpleHttpRequest.create(Method.POST, URI.create(BASE_URL + "/user/create"));
-        // I know it's ugly lol
+    public CreateUserResponse createUserRequest(String username, String password) throws IOException {
         UserData jsonData = new UserData(username, password);
 
-        request.setBody(jsonData.toJSON(), ContentType.APPLICATION_JSON);
-        SimpleHttpResponse response;
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/user/create")
+                .post(RequestBody.create(jsonData.toJSON(), APPLICATION_JSON))
+                .build();
+
         try {
-            response = httpClient.execute(request, null).get();
-        } catch (InterruptedException | ExecutionException e) {
+            Response response = httpClient.newCall(request).execute();
+            return switch (response.code()) {
+                case 201:
+                    yield CreateUserResponse.OK;
+                case 400:
+                    yield CreateUserResponse.INVALID_FORM_1;
+                case 422:
+                    yield CreateUserResponse.INVALID_FORM_2;
+                case 409:
+                    yield CreateUserResponse.USER_EXISTS;
+                case 500:
+                    yield CreateUserResponse.SERVER_ERROR;
+                default:
+                    yield CreateUserResponse.UNKNOWN;
+            };
+        } catch (ConnectException e) {
             return CreateUserResponse.SERVER_DOWN;
         }
-
-        return switch (response.getCode()) {
-            case 201:
-                yield CreateUserResponse.OK;
-            case 400:
-                yield CreateUserResponse.INVALID_FORM_1;
-            case 422:
-                yield CreateUserResponse.INVALID_FORM_2;
-            case 409:
-                yield CreateUserResponse.USER_EXISTS;
-            case 500:
-                yield CreateUserResponse.SERVER_ERROR;
-            default:
-                yield CreateUserResponse.UNKNOWN;
-        };
     }
 
-    public ListFileResponse listFiles() throws ExecutionException, InterruptedException {
-        SimpleHttpRequest request = SimpleHttpRequest.create(Method.GET, URI.create(BASE_URL + "/file/list_files/" + MainApplication.USERNAME));
-        request.setHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken());
-        SimpleHttpResponse response = httpClient.execute(request, null).get();
-        String responseBody = response.getBodyText();
+    // IT WORKED
+    // note to self:
+    // never use apache httpcomponents
+    @SuppressWarnings("DataFlowIssue")
+    public ListFileResponse listFiles() throws IOException, ConnectException {
 
-        return switch (response.getCode()) {
-            case 200 -> {
-                List<FileItem> items = gson.fromJson(responseBody, FILE_LIST_TYPE_TOKEN);
-                System.out.println(items);
-                yield ListFileResponse.okResponse(items);
-            }
-            case 403 -> {
-                showSessionExpired();
-                System.exit(0);
-                yield null;
-            }
-            case 404 -> ListFileResponse.fromCode(404);
-            default -> ListFileResponse.fromCode(response.getCode());
-        };
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/file/list_files/" + MainApplication.USERNAME)
+                .get()
+                .addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
+                .build();
+
+        try {
+            Response response = httpClient.newCall(request).execute();
+            return switch (response.code()) {
+                case 200 -> {
+                    List<FileItem> items = gson.fromJson(response.body().string(), FILE_LIST_TYPE_TOKEN);
+                    yield ListFileResponse.okResponse(items);
+                }
+                case 403 -> {
+                    showSessionExpired();
+                    System.exit(0);
+                    yield null;
+                }
+                case 404 -> ListFileResponse.fromCode(404);
+                default -> ListFileResponse.fromCode(response.code());
+            };
+        } catch (ConnectException e) {
+            throw new ConnectException(e.getMessage());
+        }
     }
 
-    public FileUploadResponse uploadFile(String name, boolean isProtected, File file) throws ExecutionException, InterruptedException, IOException {
+    @SuppressWarnings("DataFlowIssue")
+    // cannot happen ^
+    public FileUploadResponse uploadFile(String name, boolean isProtected, File file) throws IOException {
+        FileUpload jsonData = new FileUpload(name, isProtected, MainApplication.USERNAME);
 
-        String boundary = "------------------27problemsandyouaintone";
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(),
+                        RequestBody.create(file, MediaType.parse("application/octet-stream")))
+                .addFormDataPart("json_data", jsonData.toJSON())
+                .build();
 
-        FileBody fileBody = new FileBody(file);
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/file/upload")
+                .method("PUT", body)
+                .addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
+                .build();
 
-        FileUpload uploadData = new FileUpload(name, isProtected, MainApplication.USERNAME);
-        StringBody jsonData = new StringBody(uploadData.toJSON(), ContentType.APPLICATION_JSON);
-
-        HttpPut request = new HttpPut(URI.create(BASE_URL + "/file/upload"));
-
-        request.addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken());
-        request.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
-
-        MultipartEntityBuilder entity = MultipartEntityBuilder.create()
-                .addPart("file", fileBody)
-                .addPart("json_data", jsonData)
-                .setBoundary(boundary);
-
-        request.setEntity(entity.build());
-
-        SimpleHttpResponse response = httpClient.execute(SimpleRequestBuilder.copy(request).build(), null).get();
-
-        return switch(response.getCode()) {
-            case 400 -> {
-                var returnResponse = FileUploadResponse.fromCode(400);
-                System.err.println(response.getBodyText());
-                yield returnResponse;
-            }
-            case 404 -> FileUploadResponse.fromCode(404);
-            case 403 -> FileUploadResponse.fromCode(403);
-            case 500 -> FileUploadResponse.fromCode(500);
-            case 200 -> {
-                //FileItem responseItem = gson.fromJson(response.getBodyText(), FileItem.class);
-                yield null;
-            }
-            default -> FileUploadResponse.fromCode(response.getCode());
-        };
+        try {
+            Response response = httpClient.newCall(request).execute();
+            return switch (response.code()) {
+                case 400 -> FileUploadResponse.fromCode(400);
+                case 404 -> FileUploadResponse.fromCode(404);
+                case 403 -> FileUploadResponse.fromCode(403);
+                case 500 -> FileUploadResponse.fromCode(500);
+                case 201 -> {
+                    FileItem responseItem = gson.fromJson(response.body().string(), FileItem.class);
+                    yield FileUploadResponse.okResponse(responseItem);
+                }
+                default -> FileUploadResponse.fromCode(response.code());
+            };
+        } catch (ConnectException e) {
+            return FileUploadResponse.fromCode(1);
+        }
     }
+
+    public
 
     public void showSessionExpired() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
