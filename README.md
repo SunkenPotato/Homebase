@@ -2,7 +2,7 @@
 A cloud storage client I made for fun. 
 
 Originally planned for private use. \
-It uses the server [(name-here) Server](https://github.com/SunkenPotato/) to store files and authenticate
+It uses the server [(name-here) Server](https://github.com/SunkenPotato/Cloud-server) to store files and authenticate
 
 ## Usage
 You can download it, but it won't be any good since there's no server to connect it to :\
