@@ -21,7 +21,7 @@ cd build/image/bin/
 start app.bat
 ```
 
-By default, it uses the address `127.0.0.1:8000` for the server. I'll be adding configuration soon though.
+By default, it uses the address `127.0.0.1:8000` for the server. You can configure it to something else though.
 If you're really intent on using it, go and get the server.
 You'll have to set up the database manually though as well as tables.
 
