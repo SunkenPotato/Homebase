@@ -1,3 +1,8 @@
 .h1 {
     -fx-font-size: 30px;
 }
+
+.settings-button {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}

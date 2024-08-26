@@ -10,6 +10,7 @@ module com.sunkenpotato.client2p {
     requires okhttp3;
     requires annotations;
     requires kotlin.stdlib;
+    requires org.apache.logging.log4j.core;
 
     opens com.sunkenpotato.client2p to javafx.fxml;
     exports com.sunkenpotato.client2p;

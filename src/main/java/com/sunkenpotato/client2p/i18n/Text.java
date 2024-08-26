@@ -2,6 +2,8 @@ package com.sunkenpotato.client2p.i18n;
 
 import com.sunkenpotato.client2p.MainApplication;
 
+import java.util.Optional;
+
 public class Text {
 
     private final String key;
@@ -20,6 +22,12 @@ public class Text {
     }
 
     private String translateDefault(String key) {
+        Optional<String> translated = MainApplication.APPLICATION_TRANSLATOR.translateKey(key);
+        if (translated.isEmpty()) {
+            MainApplication.LOGGER.warn("Key {} not found in {}.", key, MainApplication.APPLICATION_LANGUAGE.value);
+            return "Key not found";
+        }
+
         return MainApplication.APPLICATION_TRANSLATOR.translateKey(key).get();
     }
 

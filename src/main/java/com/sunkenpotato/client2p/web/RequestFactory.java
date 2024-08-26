@@ -16,9 +16,11 @@ import java.net.ConnectException;
 import java.util.List;
 import java.util.Optional;
 
+import static com.sunkenpotato.client2p.MainApplication.SETTINGS;
+
 public class RequestFactory {
 
-    private final String BASE_URL;
+    private String BASE_URL;
     private final OkHttpClient httpClient;
     private final Gson gson = new Gson();
 
@@ -26,11 +28,15 @@ public class RequestFactory {
 
     private final TypeToken<List<FileItem>> FILE_LIST_TYPE_TOKEN = new TypeToken<>() {};
 
-    private static final RequestFactory INSTANCE = new RequestFactory(MainApplication.APPLICATION_PROPERTIES.getProperty("url"));
+    private static final RequestFactory INSTANCE = new RequestFactory(SETTINGS.getServerAddress());
 
     private RequestFactory(String url) {
         this.BASE_URL = url;
         this.httpClient = new OkHttpClient();
+    }
+
+    public void setBASE_URL(String url) {
+        this.BASE_URL = url;
     }
 
     public static RequestFactory getInstance() {
@@ -186,7 +192,7 @@ public class RequestFactory {
             ResponseBody body = response.body();
             if (body == null) return DownloadFileResponse.EMPTY_BODY;
 
-            try (InputStream in = body.byteStream(); FileOutputStream fs = new FileOutputStream(System.getProperty("user.home") + "/Downloads/" + fileItem.filename)) {
+            try (InputStream in = body.byteStream(); FileOutputStream fs = new FileOutputStream(SETTINGS.getSavePath() + "/" + fileItem.filename)) {
                 byte[] buffer = new byte[8192];
                 int bytesRead;
                 while ((bytesRead = in.read(buffer)) != -1) {

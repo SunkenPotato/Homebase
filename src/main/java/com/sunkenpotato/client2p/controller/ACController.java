@@ -1,6 +1,7 @@
 package com.sunkenpotato.client2p.controller;
 
 import atlantafx.base.controls.PasswordTextField;
+import com.sunkenpotato.client2p.MainApplication;
 import com.sunkenpotato.client2p.web.response.CreateUserResponse;
 import com.sunkenpotato.client2p.web.RequestFactory;
 import com.sunkenpotato.client2p.i18n.Text;
@@ -105,7 +106,7 @@ public class ACController {
 
     @FXML
     private void backToLoginScreen() throws IOException {
-        changeScene("fxml/login-view.fxml", 400, 600, "css/login-view.css");
+        changeScene("fxml/login-view.fxml", MainApplication.MAIN_STAGE, 400, 600, "css/login-view.css");
     }
 
     @FXML

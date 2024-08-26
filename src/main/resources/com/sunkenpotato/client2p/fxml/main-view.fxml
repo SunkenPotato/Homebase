@@ -43,11 +43,6 @@
         </columns>
     </TableView>
     <HBox alignment="CENTER_LEFT">
-        <padding>
-            <Insets topRightBottomLeft="10"/>
-        </padding>
-
         <Label fx:id="infoText"/>
     </HBox>
-
 </VBox>

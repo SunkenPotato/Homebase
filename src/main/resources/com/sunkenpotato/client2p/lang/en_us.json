@@ -25,6 +25,15 @@
   "text.response.unknown_user": "Unknown user",
   "text.response.bad_password": "Incorrect Password",
   "text.response.server_offline": "Server is unreachable. Please try again later.",
-  "text.response.unexpected_error": "An unexpected error occurred. Please check the logs for more information."
+  "text.response.unexpected_error": "An unexpected error occurred. Please check the logs for more information.",
+
+  "text.config.label.server": "Server Address",
+  "text.config.label.savepath": "Download save path",
+  "text.config.button.apply": "Apply",
+  "text.config.button.cancel": "Cancel",
+  "text.config.button.ok": "Ok",
+  "text.config.button.savepath": "Choose Path...",
+  "text.config.button.reset_server": "Use default address",
+  "text.config.button.reset_savepath": "Use default save path"
 
 }

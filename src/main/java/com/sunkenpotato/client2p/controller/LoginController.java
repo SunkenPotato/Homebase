@@ -11,9 +11,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 public class LoginController {
     @FXML
@@ -69,25 +69,30 @@ public class LoginController {
         } else {
             MainApplication.AUTHORIZATION_TOKEN.setToken(response.getToken());
             MainApplication.USERNAME = username;
-            changeScene("fxml/main-view.fxml", 900, 600);
+            changeScene("fxml/main-view.fxml", MainApplication.MAIN_STAGE, 900, 600);
         }
     }
 
     @FXML
     private void createAccount() throws IOException {
-        changeScene("fxml/create-account.fxml", 400, 600, "css/create-account.css");
+        changeScene("fxml/create-account.fxml", MainApplication.MAIN_STAGE, 400, 600, "css/create-account.css");
     }
 
-    public static void changeScene(String fxml, int width, int height, String... stylesheets) throws IOException {
+    @FXML
+    private void openConfig() throws IOException {
+        Stage configStage = new Stage();
+        changeScene("fxml/config-view.fxml", configStage, 600, 400);
+    }
+
+    public static void changeScene(String fxml, Stage stage, int width, int height, String... stylesheets) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource(fxml));
         Scene scene = new Scene(fxmlLoader.load(), width, height);
         for (String stylesheet : stylesheets) {
             scene.getStylesheets().add(MainApplication.class.getResource(stylesheet).toExternalForm());
         }
         scene.getStylesheets().add(MainApplication.class.getResource("css/global.css").toExternalForm());
-        MainApplication.MAIN_STAGE.setScene(scene);
-        MainApplication.MAIN_STAGE.show();
+        stage.setScene(scene);
+        stage.show();
     }
-
 
 }
