@@ -1,13 +1,9 @@
 package com.sunkenpotato.client2p.internal;
 
 import com.sunkenpotato.client2p.MainApplication;
-import com.sunkenpotato.client2p.web.RequestFactory;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 // This is probably not programmed too well
@@ -18,7 +14,7 @@ public class AppSettings {
     public final Properties defaultProperties = new Properties();
 
     private final File settingsFile = new File(System.getProperty("user.home") + "/.local/2P/settings.properties");
-    private Properties settings = new Properties();
+    private final Properties settings = new Properties();
 
 
     private final Logger LOGGER = MainApplication.LOGGER;
