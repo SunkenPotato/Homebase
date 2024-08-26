@@ -1,6 +1,7 @@
 package com.sunkenpotato.client2p.controller;
 
 import com.sunkenpotato.client2p.i18n.Text;
+import com.sunkenpotato.client2p.web.RequestFactory;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -52,8 +53,12 @@ public class ConfigController {
 
     @FXML
     private void applySettings() throws IOException {
-        SETTINGS.setServerAddress(serverTextField.getText());
+        String serverAddress = serverTextField.getText();
+
+        SETTINGS.setServerAddress(serverAddress);
         SETTINGS.setSavePath(savePathDescriptor.getText());
+
+        RequestFactory.getInstance().setBASE_URL(serverAddress);
 
         SETTINGS.syncFS();
     }

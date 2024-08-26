@@ -1,6 +1,7 @@
 package com.sunkenpotato.client2p.internal;
 
 import com.sunkenpotato.client2p.MainApplication;
+import com.sunkenpotato.client2p.web.RequestFactory;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
