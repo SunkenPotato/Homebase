@@ -76,10 +76,9 @@ test {
 
 jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages', '--module-path', '/Users/piro/Downloads/javafx-sdk-21.0.4/lib',
-        '--add-modules']
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages', '--module-path', '/Users/piro/Downloads/javafx-sdk-21.0.4/lib',]
     launcher {
-        name = 'app'
+        name = 'Homebase'
     }
 }
 

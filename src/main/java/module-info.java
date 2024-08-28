@@ -2,6 +2,8 @@ module com.sunkenpotato.client2p {
     requires javafx.fxml;
 
     requires org.kordamp.bootstrapfx.core;
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.feather;
     requires atlantafx.base;
     requires com.google.gson;
     requires org.apache.commons.io;
