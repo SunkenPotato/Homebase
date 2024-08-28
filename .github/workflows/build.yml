@@ -1,0 +1,61 @@
+name: Build and Package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build and Package on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'  # Adjust to your Java version
+
+    - name: Grant execute permission for Gradle script (Linux/macOS only)
+      if: runner.os != 'Windows'
+      run: chmod +x ./gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew jpackage
+
+    - name: Upload application package (Linux/Windows)
+      if: runner.os != 'macOS'
+      uses: actions/upload-artifact@v3
+      with:
+        name: packaged-application-${{ matrix.os }}
+        path: build/jpackage
+
+    - name: Upload macOS .app file
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos-app
+        path: build/jpackage/*.app
+
+    - name: Upload macOS .dmg file
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos-dmg
+        path: build/jpackage/*.dmg
+
+    - name: Upload macOS .pkg file
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos-pkg
+        path: build/jpackage/*.pkg
