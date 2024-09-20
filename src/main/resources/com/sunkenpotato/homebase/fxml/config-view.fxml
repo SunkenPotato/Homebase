@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--suppress JavaFxUnresolvedStyleClassReference -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.sunkenpotato.homebase.controller.ConfigController">
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="20" bottom="20" left="40" right="40"/>
+            </padding>
+            <Label fx:id="serverLabel"/>
+            <HBox spacing="10">
+                <TextField fx:id="serverTextField" minWidth="300"/>
+                <Button fx:id="resetServerPathToDefault" onAction="#resetServerPath"/>
+            </HBox>
+            <Label fx:id="savePathLabel"/>
+            <HBox spacing="10">
+                <TextField fx:id="savePathDescriptor" minWidth="300"/>
+                <Button fx:id="savePathButton" onAction="#chooseDirectory"/>
+            </HBox>
+            <Button fx:id="resetSavePathToDefault" onAction="#resetSavePath"/>
+            <Separator/>
+            <Label fx:id="languageLabel"/>
+            <ComboBox fx:id="languageSelector"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <padding>
+                <Insets topRightBottomLeft="20"/>
+            </padding>
+            <Button fx:id="applyButton" onAction="#applySettings"/>
+            <Button fx:id="cancelButton" onAction="#cancelSettings"/>
+            <Button fx:id="okButton" onAction="#okSettings" styleClass="accent"/>
+        </HBox>
+    </bottom>
+</BorderPane>
