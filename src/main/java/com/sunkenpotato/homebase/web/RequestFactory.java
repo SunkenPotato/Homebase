@@ -20,27 +20,25 @@ import static com.sunkenpotato.homebase.config.Config.expandTilde;
 
 public class RequestFactory {
 
-    private String BASE_URL;
+    private static final MediaType APPLICATION_JSON = MediaType.parse("application/json");
+    private static final RequestFactory INSTANCE = new RequestFactory(SETTINGS.get("server.address").get());
     private final OkHttpClient httpClient;
     private final Gson gson = new Gson();
-
-    private static final MediaType APPLICATION_JSON = MediaType.parse("application/json");
-
-    private final TypeToken<List<FileItem>> FILE_LIST_TYPE_TOKEN = new TypeToken<>() {};
-
-    private static final RequestFactory INSTANCE = new RequestFactory(SETTINGS.get("server.address").get());
+    private final TypeToken<List<FileItem>> FILE_LIST_TYPE_TOKEN = new TypeToken<>() {
+    };
+    private String BASE_URL;
 
     private RequestFactory(String url) {
         this.BASE_URL = url;
         this.httpClient = new OkHttpClient();
     }
 
-    public void setBASE_URL(String url) {
-        this.BASE_URL = url;
-    }
-
     public static RequestFactory getInstance() {
         return INSTANCE;
+    }
+
+    public void setBASE_URL(String url) {
+        this.BASE_URL = url;
     }
 
     // okhttp so much cleaner ong ong
@@ -49,10 +47,7 @@ public class RequestFactory {
 
         UserData body = new UserData(username, password);
 
-        Request request = new Request.Builder()
-                .url(BASE_URL + "/user/login")
-                .post(RequestBody.create(body.toJSON(), APPLICATION_JSON))
-                .build();
+        Request request = new Request.Builder().url(BASE_URL + "/user/login").post(RequestBody.create(body.toJSON(), APPLICATION_JSON)).build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             return switch (response.code()) {
@@ -73,10 +68,7 @@ public class RequestFactory {
     public CreateUserResponse createUserRequest(String username, String password) throws IOException {
         UserData jsonData = new UserData(username, password);
 
-        Request request = new Request.Builder()
-                .url(BASE_URL + "/user/")
-                .post(RequestBody.create(jsonData.toJSON(), APPLICATION_JSON))
-                .build();
+        Request request = new Request.Builder().url(BASE_URL + "/user/").post(RequestBody.create(jsonData.toJSON(), APPLICATION_JSON)).build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             return switch (response.code()) {
@@ -104,11 +96,7 @@ public class RequestFactory {
     @SuppressWarnings("DataFlowIssue")
     public ListFileResponse listFiles() throws IOException {
 
-        Request request = new Request.Builder()
-                .url(BASE_URL + "/file")
-                .get()
-                .addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
-                .build();
+        Request request = new Request.Builder().url(BASE_URL + "/file").get().addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken()).build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             return switch (response.code()) {
@@ -134,17 +122,9 @@ public class RequestFactory {
     public FileUploadResponse uploadFile(String name, boolean isProtected, File file) throws IOException {
         FileUpload jsonData = new FileUpload(name, isProtected);
 
-        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("file", file.getName(),
-                        RequestBody.create(file, MediaType.parse("multipart/form-data")))
-                .addFormDataPart("json", jsonData.toJSON())
-                .build();
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("file", file.getName(), RequestBody.create(file, MediaType.parse("multipart/form-data"))).addFormDataPart("json", jsonData.toJSON()).build();
 
-        Request request = new Request.Builder()
-                .url(BASE_URL + "/file/")
-                .method("POST", body)
-                .addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
-                .build();
+        Request request = new Request.Builder().url(BASE_URL + "/file/").method("POST", body).addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken()).build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             System.out.println(response.message());
@@ -153,7 +133,7 @@ public class RequestFactory {
                 case 404 -> FileUploadResponse.fromCode(404);
                 case 403 -> FileUploadResponse.fromCode(403);
                 case 500 -> FileUploadResponse.fromCode(500);
-                case 201 -> {
+                case 200 -> {
                     FileItem responseItem = gson.fromJson(response.body().string(), FileItem.class);
                     yield FileUploadResponse.okResponse(responseItem);
                 }
@@ -166,11 +146,7 @@ public class RequestFactory {
 
     public DownloadFileResponse downloadFile(FileItem fileItem) throws IOException {
         System.out.println(fileItem.route);
-        Request request = new Request.Builder()
-                .url(BASE_URL + '/' + fileItem.route)
-                .get()
-                .addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
-                .build();
+        Request request = new Request.Builder().url(BASE_URL + '/' + fileItem.route).get().addHeader("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken()).build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
@@ -203,19 +179,16 @@ public class RequestFactory {
         }
     }
 
-    public DeleteFileResponse deleteFile(FileItem fileItem) throws IOException{
-        Request request = new Request.Builder()
-                .url(BASE_URL + '/' + fileItem.route) // TODO: replace w/ string templates or something
-                .delete()
-                .header("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken())
-                .build();
+    public DeleteFileResponse deleteFile(FileItem fileItem) throws IOException {
+        Request request = new Request.Builder().url(BASE_URL + '/' + fileItem.route) // TODO: replace w/ string templates or something
+                .delete().header("Authorization", MainApplication.AUTHORIZATION_TOKEN.getToken()).build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             return switch (response.code()) {
                 case 404 -> DeleteFileResponse.NOT_FOUND;
                 case 403 -> DeleteFileResponse.FORBIDDEN;
                 case 500 -> DeleteFileResponse.FS_ERROR;
-                case 200 -> DeleteFileResponse.OK;
+                case 201 -> DeleteFileResponse.OK;
                 default -> DeleteFileResponse.UNKNOWN;
             };
         } catch (ConnectException e) {

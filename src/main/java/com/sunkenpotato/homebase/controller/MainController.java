@@ -202,6 +202,7 @@ public class MainController {
         switch (response) {
             case OK ->  {
                 fileTable.getItems().remove(fileItem);
+                fileTable.refresh();
                 infoText.setText(fileItem.name + " Deleted");
             }
             case NOT_FOUND -> infoText.setText(fileItem.name + " Not Found");
