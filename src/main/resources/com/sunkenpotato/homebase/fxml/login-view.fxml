@@ -41,7 +41,7 @@
                 <Label fx:id="passwordLabel"/>
                 <PasswordTextField fx:id="passwordField"/>
             </HBox>
-            <Label fx:id="infoText"/>
+            <Label fx:id="infoText" wrapText="true" textAlignment="CENTER"/>
             <HBox spacing="10" alignment="CENTER">
                 <Button style="-fx-background-color: -color-accent-5" fx:id="loginButton" onAction="#login">Log in</Button>
                 <Button style="-fx-background-color: -color-base-5" fx:id="accountCreationButton" onAction="#createAccount">Create an account</Button>

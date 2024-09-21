@@ -3,6 +3,7 @@ package com.sunkenpotato.homebase.controller;
 import com.sunkenpotato.homebase.MainApplication;
 import com.sunkenpotato.homebase.web.RequestFactory;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -21,6 +22,16 @@ public class ControllerHandler {
         scene.getStylesheets().add(MainApplication.class.getResource("css/global.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
+    }
+
+    public static void setTitle(Stage stage, String title) {
+        stage.setTitle(title);
+    }
+
+    public static void setTitle(Node node, String title) {
+         node.getParent().sceneProperty().addListener(((observable, oldValue, newValue) ->
+                newValue.windowProperty().addListener(((observable1, oldValue1, newValue1) ->
+                        ((Stage) newValue1).setTitle(title)))));
     }
 
 }

@@ -12,8 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static com.sunkenpotato.homebase.controller.ControllerHandler.REQUEST_FACTORY;
-import static com.sunkenpotato.homebase.controller.ControllerHandler.changeScene;
+import static com.sunkenpotato.homebase.controller.ControllerHandler.*;
 
 public class LoginController {
     @FXML
@@ -34,6 +33,7 @@ public class LoginController {
 
     @FXML
     public void initialize() {
+        setTitle(usernameLabel, "Homebase - Login");
         usernameLabel.setText(usernameText.getTranslated());
         passwordLabel.setText(passwordText.getTranslated());
         loginButton.setText(loginText.getTranslated());
@@ -45,7 +45,7 @@ public class LoginController {
         final String username = usernameField.getText();
         final String password = passwordField.getPassword();
 
-        LoginResponse response = null;
+        LoginResponse response;
 
         response = REQUEST_FACTORY.loginRequest(username, password);
 

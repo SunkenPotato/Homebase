@@ -44,6 +44,8 @@ public class ConfigController {
 
     @FXML
     private void initialize() {
+        ControllerHandler.setTitle(serverLabel, "Homebase - Settings");
+
         serverLabel.setText(serverLabelText.getTranslated());
         applyButton.setText(applyButtonText.getTranslated());
         cancelButton.setText(cancelButtonText.getTranslated());

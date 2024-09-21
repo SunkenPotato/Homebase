@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import java.io.IOException;
 
 import static com.sunkenpotato.homebase.controller.ControllerHandler.changeScene;
+import static com.sunkenpotato.homebase.controller.ControllerHandler.setTitle;
 
 public class ACController {
     @FXML
@@ -45,6 +46,8 @@ public class ACController {
 
     @FXML
     private void initialize() {
+        setTitle(usernameLabel, "Homebase - Create account");
+
         Text usernameText = Text.translatable("text.labels.username");
         Text passwordText = Text.translatable("text.labels.password");
         Text confirmPasswordText = Text.translatable("text.labels.confirm_password");

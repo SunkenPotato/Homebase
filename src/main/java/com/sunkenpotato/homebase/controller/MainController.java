@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static com.sunkenpotato.homebase.MainApplication.LOGGER;
 import static com.sunkenpotato.homebase.MainApplication.SETTINGS;
+import static com.sunkenpotato.homebase.controller.ControllerHandler.setTitle;
 
 public class MainController {
 
@@ -54,6 +55,8 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        setTitle(uploadButton, "Homebase");
+
         initCellValueFactories();
 
         setColumnNames();
