@@ -20,7 +20,7 @@
   "text.errors.error": "Error",
 
   "text.response.file_not_found": "The requested file was not found on the server",
-  "text.response.file_downloaded": "File successfully downloaded to ",
+  "text.response.file_downloaded": "File successfully downloaded to",
   "text.response.user_exists": "User already exists!",
   "text.response.server_error": "An unexpected server error occurred.",
   "text.response.user_created": "User created!",

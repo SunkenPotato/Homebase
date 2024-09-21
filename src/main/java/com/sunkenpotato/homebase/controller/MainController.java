@@ -23,9 +23,17 @@ import java.net.ConnectException;
 import java.util.Optional;
 
 import static com.sunkenpotato.homebase.MainApplication.LOGGER;
+import static com.sunkenpotato.homebase.MainApplication.SETTINGS;
 
 public class MainController {
 
+    private final RequestFactory REQUEST_FACTORY = RequestFactory.getInstance();
+    private final Text serverOfflineText = Text.translatable("text.response.server_offline");
+    private final Text errorText = Text.translatable("text.errors.error");
+    private final Text unexpectedErrorText = Text.translatable("text.response.unexpected_error");
+    private final Text fileDownloadedText = Text.translatable("text.response.file_downloaded");
+    private final Text fileNotFoundText = Text.translatable("text.response.file_not_found");
+    private final Text serverFSError = Text.translatable("text.response.server_fs_error");
     @FXML
     private Label infoText;
     @FXML
@@ -36,15 +44,6 @@ public class MainController {
     private TableColumn<FileItem, String> nameColumn, typeColumn, sizeColumn;
     @FXML
     private TableColumn<FileItem, String> protectedColumn;
-
-    private final RequestFactory REQUEST_FACTORY = RequestFactory.getInstance();
-
-    private final Text serverOfflineText = Text.translatable("text.response.server_offline");
-    private final Text errorText = Text.translatable("text.errors.error");
-    private final Text unexpectedErrorText = Text.translatable("text.response.unexpected_error");
-    private final Text fileDownloadedText = Text.translatable("text.response.file_downloaded");
-    private final Text fileNotFoundText = Text.translatable("text.response.file_not_found");
-    private final Text serverFSError = Text.translatable("text.response.server_fs_error");
 
     public static void showAlert(Text title, Text content, Alert.AlertType type) {
         Alert alert = new Alert(type);
@@ -102,12 +101,13 @@ public class MainController {
         DownloadFileResponse response = REQUEST_FACTORY.downloadFile(fileItem);
         switch (response) {
             // TODO: set this to a custom path/.properties path
-            case OK -> infoText.setText(fileDownloadedText.getTranslated() + " Downloads");
+            case OK -> appendTextToInfoText(fileDownloadedText.getTranslated() + SETTINGS.get("save.path").get());
             case NOT_FOUND -> setInfoTextWarn(fileNotFoundText);
             case CONNECTION_FAILURE -> showAlert(errorText, serverOfflineText, Alert.AlertType.ERROR);
             case UNKNOWN -> showAlert(errorText, unexpectedErrorText, Alert.AlertType.ERROR);
             case SERVER_FS_ERROR -> setInfoTextWarn(serverFSError);
-            case SESSION_EXPIRED, EMPTY_BODY -> {}
+            case SESSION_EXPIRED, EMPTY_BODY -> {
+            }
         }
     }
 
@@ -200,15 +200,19 @@ public class MainController {
 
         DeleteFileResponse response = REQUEST_FACTORY.deleteFile(fileItem);
         switch (response) {
-            case OK ->  {
+            case OK -> {
                 fileTable.getItems().remove(fileItem);
                 fileTable.refresh();
-                infoText.setText(fileItem.name + " Deleted");
+                appendTextToInfoText(fileItem.getName() + " Deleted");
             }
             case NOT_FOUND -> infoText.setText(fileItem.name + " Not Found");
             case FORBIDDEN -> REQUEST_FACTORY.showSessionExpired();
             case CONNECTION_ERROR -> showAlert(errorText, serverOfflineText, Alert.AlertType.ERROR);
             case UNKNOWN -> showAlert(errorText, unexpectedErrorText, Alert.AlertType.ERROR);
         }
+    }
+
+    private void appendTextToInfoText(String text) {
+        infoText.setText(infoText.getText() + "\n" + text);
     }
 }

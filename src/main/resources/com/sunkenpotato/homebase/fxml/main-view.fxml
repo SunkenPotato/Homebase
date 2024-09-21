@@ -42,6 +42,9 @@
         </columns>
     </TableView>
     <HBox alignment="CENTER_LEFT">
-        <Label fx:id="infoText"/>
+        <padding>
+            <Insets topRightBottomLeft="20"/>
+        </padding>
+        <Label fx:id="infoText" wrapText="true"/>
     </HBox>
 </VBox>
