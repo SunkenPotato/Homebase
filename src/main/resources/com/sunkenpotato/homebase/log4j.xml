@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%style{%d{HH:mm:ss.SSS}}{green} %style{[%t]}{blue} [%-5level] %logger{36} - %msg%n"/>
+        </Console>
+
+        <!-- Rolling File Appender
+        <RollingFile name="FileLogger" fileName="logs/Homebase.log"
+                     filePattern="Homebase-%d{yyyy-MM-dd_HH:mm}.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] [%-5level] %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>-->
+
+        <!-- Rolling File Appender -->
+        <RollingFile name="FileLogger" fileName="logs/latest.log"
+                     filePattern="logs/Homebase-%d{yyyy-MM-dd_HH:mm}.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>

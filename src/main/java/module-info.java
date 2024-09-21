@@ -1,4 +1,4 @@
-module com.sunkenpotato.client2p {
+module com.sunkenpotato.homebase {
     requires javafx.fxml;
 
     requires org.kordamp.bootstrapfx.core;
@@ -14,12 +14,13 @@ module com.sunkenpotato.client2p {
     requires kotlin.stdlib;
     requires org.apache.logging.log4j.core;
 
-    opens com.sunkenpotato.client2p to javafx.fxml;
-    exports com.sunkenpotato.client2p;
-    exports com.sunkenpotato.client2p.controller;
-    exports com.sunkenpotato.client2p.internal;
-    opens com.sunkenpotato.client2p.controller to javafx.fxml;
-    exports com.sunkenpotato.client2p.web;
-    exports com.sunkenpotato.client2p.i18n;
-    exports com.sunkenpotato.client2p.web.response;
+    opens com.sunkenpotato.homebase to javafx.fxml;
+    exports com.sunkenpotato.homebase;
+    exports com.sunkenpotato.homebase.controller;
+    exports com.sunkenpotato.homebase.internal;
+    opens com.sunkenpotato.homebase.controller to javafx.fxml;
+    exports com.sunkenpotato.homebase.web;
+    exports com.sunkenpotato.homebase.i18n;
+    exports com.sunkenpotato.homebase.web.response;
+    exports com.sunkenpotato.homebase.config;
 }

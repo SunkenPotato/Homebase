@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.geometry.Insets?>
+<!--suppress JavaFxUnresolvedStyleClassReference -->
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.sunkenpotato.homebase.controller.MainController">
+
+    <HBox alignment="CENTER_LEFT">
+        <ButtonBar>
+            <HBox.margin>
+                <Insets top="15" bottom="15"/>
+            </HBox.margin>
+            <buttons>
+                <Button fx:id="uploadButton" styleClass="accent" onAction="#uploadFile">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-upload-cloud" iconSize="30"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="downloadButton" disable="true" onAction="#downloadFile">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-download-cloud" iconSize="30"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="deleteButton" disable="true" styleClass="danger" onAction="#deleteFile">
+                    <graphic>
+                        <FontIcon iconLiteral="fth-trash-2" iconSize="30"/>
+                    </graphic>
+                </Button>
+            </buttons>
+        </ButtonBar>
+    </HBox>
+    <TableView fx:id="fileTable">
+        <columns>
+            <TableColumn fx:id="protectedColumn" minWidth="100" maxWidth="100"/>
+            <TableColumn fx:id="nameColumn" minWidth="200" maxWidth="500"/>
+            <TableColumn fx:id="typeColumn" minWidth="200"/>
+            <TableColumn fx:id="sizeColumn" text="Size" />
+        </columns>
+    </TableView>
+    <HBox alignment="CENTER_LEFT">
+        <padding>
+            <Insets topRightBottomLeft="20"/>
+        </padding>
+        <Label fx:id="infoText" wrapText="true"/>
+    </HBox>
+</VBox>
