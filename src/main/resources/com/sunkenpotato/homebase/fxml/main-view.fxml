@@ -45,6 +45,6 @@
         <padding>
             <Insets topRightBottomLeft="20"/>
         </padding>
-        <Label fx:id="infoText" wrapText="true"/>
+        <TextArea editable="false" fx:id="infoText" wrapText="true" HBox.hgrow="ALWAYS"/>
     </HBox>
 </VBox>

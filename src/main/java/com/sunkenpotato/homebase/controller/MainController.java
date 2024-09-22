@@ -36,7 +36,7 @@ public class MainController {
     private final Text fileNotFoundText = Text.translatable("text.response.file_not_found");
     private final Text serverFSError = Text.translatable("text.response.server_fs_error");
     @FXML
-    private Label infoText;
+    private TextArea infoText;
     @FXML
     private Button uploadButton, deleteButton, downloadButton;
     @FXML

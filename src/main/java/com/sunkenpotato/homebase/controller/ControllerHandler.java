@@ -25,13 +25,20 @@ public class ControllerHandler {
     }
 
     public static void setTitle(Stage stage, String title) {
-        stage.setTitle(title);
+        stage.setTitle(title);  
     }
 
     public static void setTitle(Node node, String title) {
-         node.getParent().sceneProperty().addListener(((observable, oldValue, newValue) ->
-                newValue.windowProperty().addListener(((observable1, oldValue1, newValue1) ->
-                        ((Stage) newValue1).setTitle(title)))));
+        node.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow instanceof Stage) {
+                        ((Stage) newWindow).setTitle(title);
+                    }
+                });
+            }
+        });
     }
+
 
 }
